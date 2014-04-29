@@ -271,11 +271,40 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.helpers.dimensions'])
           var tipWidth = tipElement.prop('offsetWidth'),
               tipHeight = tipElement.prop('offsetHeight');
 
+            // TODO $options.placement check for auto
+            var autoToken = /\s?auto?\s?/i;
+            var autoPlace = autoToken.test($tooltip.$options.placement);
+            // TODO if auto then place onscreen
+            if (autoPlace) {
+                var $parent = $tooltip.$element.parent();
+                var pos          = elementPosition;
+                var actualWidth  = tipWidth;
+                var actualHeight = tipHeight;
+                var orgPlacement = $tooltip.$options.placement;
+                var docScroll    = document.documentElement.scrollTop || document.body.scrollTop
+                var parentWidth  = $tooltip.$options.container == 'body' ? window.innerWidth  : $parent.outerWidth()
+                var parentHeight = $tooltip.$options.container == 'body' ? window.innerHeight : $parent.outerHeight()
+                var parentLeft   = $tooltip.$options.container == 'body' ? 0 : $parent.offset().left
+                var placement = 'top';
+                placement = placement == 'bottom' && pos.top   + pos.height  + actualHeight - docScroll > parentHeight  ? 'top'    :
+                        placement == 'top'    && pos.top   - docScroll   - actualHeight < 0                         ? 'bottom' :
+                        placement == 'right'  && pos.right + actualWidth > parentWidth                              ? 'left'   :
+                        placement == 'left'   && pos.left  - actualWidth < parentLeft                               ? 'right'  :
+                    placement
+
+                $tooltip.$element
+                    .removeClass(orgPlacement)
+                    .addClass(placement);
+                options.placement = placement;
+            }
+
           // Get the tooltip's top and left coordinates to center it with this directive.
           var tipPosition = getCalculatedOffset(options.placement, elementPosition, tipWidth, tipHeight);
 
           // Now set the calculated positioning.
           tipPosition.top += 'px';
+            tipPosition.left = ((tipPosition.left < 0) ? 0 : tipPosition.left);
+            // TODO correct arrow placement
           tipPosition.left += 'px';
           tipElement.css(tipPosition);
 

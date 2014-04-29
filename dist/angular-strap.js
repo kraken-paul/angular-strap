@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.0.2 - 2014-04-27
+ * @version v2.0.2 - 2014-04-29
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes (olivier@mg-crea.com)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -402,141 +402,6 @@ angular.module('mgcrea.ngStrap.aside', ['mgcrea.ngStrap.modal']).provider('$asid
           aside.destroy();
           options = null;
           aside = null;
-        });
-      }
-    };
-  }
-]);
-
-// Source: button.js
-angular.module('mgcrea.ngStrap.button', []).provider('$button', function () {
-  var defaults = this.defaults = {
-      activeClass: 'active',
-      toggleEvent: 'click'
-    };
-  this.$get = function () {
-    return { defaults: defaults };
-  };
-}).directive('bsCheckboxGroup', function () {
-  return {
-    restrict: 'A',
-    require: 'ngModel',
-    compile: function postLink(element, attr) {
-      element.attr('data-toggle', 'buttons');
-      element.removeAttr('ng-model');
-      var children = element[0].querySelectorAll('input[type="checkbox"]');
-      angular.forEach(children, function (child) {
-        var childEl = angular.element(child);
-        childEl.attr('bs-checkbox', '');
-        childEl.attr('ng-model', attr.ngModel + '.' + childEl.attr('value'));
-      });
-    }
-  };
-}).directive('bsCheckbox', [
-  '$button',
-  '$$rAF',
-  function ($button, $$rAF) {
-    var defaults = $button.defaults;
-    var constantValueRegExp = /^(true|false|\d+)$/;
-    return {
-      restrict: 'A',
-      require: 'ngModel',
-      link: function postLink(scope, element, attr, controller) {
-        var options = defaults;
-        // Support label > input[type="checkbox"]
-        var isInput = element[0].nodeName === 'INPUT';
-        var activeElement = isInput ? element.parent() : element;
-        var trueValue = angular.isDefined(attr.trueValue) ? attr.trueValue : true;
-        if (constantValueRegExp.test(attr.trueValue)) {
-          trueValue = scope.$eval(attr.trueValue);
-        }
-        var falseValue = angular.isDefined(attr.falseValue) ? attr.falseValue : false;
-        if (constantValueRegExp.test(attr.falseValue)) {
-          falseValue = scope.$eval(attr.falseValue);
-        }
-        // Parse exotic values
-        var hasExoticValues = typeof trueValue !== 'boolean' || typeof falseValue !== 'boolean';
-        if (hasExoticValues) {
-          controller.$parsers.push(function (viewValue) {
-            // console.warn('$parser', element.attr('ng-model'), 'viewValue', viewValue);
-            return viewValue ? trueValue : falseValue;
-          });
-          // Fix rendering for exotic values
-          scope.$watch(attr.ngModel, function (newValue, oldValue) {
-            controller.$render();
-          });
-        }
-        // model -> view
-        controller.$render = function () {
-          // console.warn('$render', element.attr('ng-model'), 'controller.$modelValue', typeof controller.$modelValue, controller.$modelValue, 'controller.$viewValue', typeof controller.$viewValue, controller.$viewValue);
-          var isActive = angular.equals(controller.$modelValue, trueValue);
-          $$rAF(function () {
-            if (isInput)
-              element[0].checked = isActive;
-            activeElement.toggleClass(options.activeClass, isActive);
-          });
-        };
-        // view -> model
-        element.bind(options.toggleEvent, function () {
-          scope.$apply(function () {
-            // console.warn('!click', element.attr('ng-model'), 'controller.$viewValue', typeof controller.$viewValue, controller.$viewValue, 'controller.$modelValue', typeof controller.$modelValue, controller.$modelValue);
-            if (!isInput) {
-              controller.$setViewValue(!activeElement.hasClass('active'));
-            }
-            if (!hasExoticValues) {
-              controller.$render();
-            }
-          });
-        });
-      }
-    };
-  }
-]).directive('bsRadioGroup', function () {
-  return {
-    restrict: 'A',
-    require: 'ngModel',
-    compile: function postLink(element, attr) {
-      element.attr('data-toggle', 'buttons');
-      element.removeAttr('ng-model');
-      var children = element[0].querySelectorAll('input[type="radio"]');
-      angular.forEach(children, function (child) {
-        angular.element(child).attr('bs-radio', '');
-        angular.element(child).attr('ng-model', attr.ngModel);
-      });
-    }
-  };
-}).directive('bsRadio', [
-  '$button',
-  '$$rAF',
-  function ($button, $$rAF) {
-    var defaults = $button.defaults;
-    var constantValueRegExp = /^(true|false|\d+)$/;
-    return {
-      restrict: 'A',
-      require: 'ngModel',
-      link: function postLink(scope, element, attr, controller) {
-        var options = defaults;
-        // Support `label > input[type="radio"]` markup
-        var isInput = element[0].nodeName === 'INPUT';
-        var activeElement = isInput ? element.parent() : element;
-        var value = constantValueRegExp.test(attr.value) ? scope.$eval(attr.value) : attr.value;
-        // model -> view
-        controller.$render = function () {
-          // console.warn('$render', element.attr('value'), 'controller.$modelValue', typeof controller.$modelValue, controller.$modelValue, 'controller.$viewValue', typeof controller.$viewValue, controller.$viewValue);
-          var isActive = angular.equals(controller.$modelValue, value);
-          $$rAF(function () {
-            if (isInput)
-              element[0].checked = isActive;
-            activeElement.toggleClass(options.activeClass, isActive);
-          });
-        };
-        // view -> model
-        element.bind(options.toggleEvent, function () {
-          scope.$apply(function () {
-            // console.warn('!click', element.attr('value'), 'controller.$viewValue', typeof controller.$viewValue, controller.$viewValue, 'controller.$modelValue', typeof controller.$modelValue, controller.$modelValue);
-            controller.$setViewValue(value);
-            controller.$render();
-          });
         });
       }
     };
@@ -1130,6 +995,141 @@ angular.module('mgcrea.ngStrap.datepicker', [
     }
   ];
 });
+
+// Source: button.js
+angular.module('mgcrea.ngStrap.button', []).provider('$button', function () {
+  var defaults = this.defaults = {
+      activeClass: 'active',
+      toggleEvent: 'click'
+    };
+  this.$get = function () {
+    return { defaults: defaults };
+  };
+}).directive('bsCheckboxGroup', function () {
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    compile: function postLink(element, attr) {
+      element.attr('data-toggle', 'buttons');
+      element.removeAttr('ng-model');
+      var children = element[0].querySelectorAll('input[type="checkbox"]');
+      angular.forEach(children, function (child) {
+        var childEl = angular.element(child);
+        childEl.attr('bs-checkbox', '');
+        childEl.attr('ng-model', attr.ngModel + '.' + childEl.attr('value'));
+      });
+    }
+  };
+}).directive('bsCheckbox', [
+  '$button',
+  '$$rAF',
+  function ($button, $$rAF) {
+    var defaults = $button.defaults;
+    var constantValueRegExp = /^(true|false|\d+)$/;
+    return {
+      restrict: 'A',
+      require: 'ngModel',
+      link: function postLink(scope, element, attr, controller) {
+        var options = defaults;
+        // Support label > input[type="checkbox"]
+        var isInput = element[0].nodeName === 'INPUT';
+        var activeElement = isInput ? element.parent() : element;
+        var trueValue = angular.isDefined(attr.trueValue) ? attr.trueValue : true;
+        if (constantValueRegExp.test(attr.trueValue)) {
+          trueValue = scope.$eval(attr.trueValue);
+        }
+        var falseValue = angular.isDefined(attr.falseValue) ? attr.falseValue : false;
+        if (constantValueRegExp.test(attr.falseValue)) {
+          falseValue = scope.$eval(attr.falseValue);
+        }
+        // Parse exotic values
+        var hasExoticValues = typeof trueValue !== 'boolean' || typeof falseValue !== 'boolean';
+        if (hasExoticValues) {
+          controller.$parsers.push(function (viewValue) {
+            // console.warn('$parser', element.attr('ng-model'), 'viewValue', viewValue);
+            return viewValue ? trueValue : falseValue;
+          });
+          // Fix rendering for exotic values
+          scope.$watch(attr.ngModel, function (newValue, oldValue) {
+            controller.$render();
+          });
+        }
+        // model -> view
+        controller.$render = function () {
+          // console.warn('$render', element.attr('ng-model'), 'controller.$modelValue', typeof controller.$modelValue, controller.$modelValue, 'controller.$viewValue', typeof controller.$viewValue, controller.$viewValue);
+          var isActive = angular.equals(controller.$modelValue, trueValue);
+          $$rAF(function () {
+            if (isInput)
+              element[0].checked = isActive;
+            activeElement.toggleClass(options.activeClass, isActive);
+          });
+        };
+        // view -> model
+        element.bind(options.toggleEvent, function () {
+          scope.$apply(function () {
+            // console.warn('!click', element.attr('ng-model'), 'controller.$viewValue', typeof controller.$viewValue, controller.$viewValue, 'controller.$modelValue', typeof controller.$modelValue, controller.$modelValue);
+            if (!isInput) {
+              controller.$setViewValue(!activeElement.hasClass('active'));
+            }
+            if (!hasExoticValues) {
+              controller.$render();
+            }
+          });
+        });
+      }
+    };
+  }
+]).directive('bsRadioGroup', function () {
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    compile: function postLink(element, attr) {
+      element.attr('data-toggle', 'buttons');
+      element.removeAttr('ng-model');
+      var children = element[0].querySelectorAll('input[type="radio"]');
+      angular.forEach(children, function (child) {
+        angular.element(child).attr('bs-radio', '');
+        angular.element(child).attr('ng-model', attr.ngModel);
+      });
+    }
+  };
+}).directive('bsRadio', [
+  '$button',
+  '$$rAF',
+  function ($button, $$rAF) {
+    var defaults = $button.defaults;
+    var constantValueRegExp = /^(true|false|\d+)$/;
+    return {
+      restrict: 'A',
+      require: 'ngModel',
+      link: function postLink(scope, element, attr, controller) {
+        var options = defaults;
+        // Support `label > input[type="radio"]` markup
+        var isInput = element[0].nodeName === 'INPUT';
+        var activeElement = isInput ? element.parent() : element;
+        var value = constantValueRegExp.test(attr.value) ? scope.$eval(attr.value) : attr.value;
+        // model -> view
+        controller.$render = function () {
+          // console.warn('$render', element.attr('value'), 'controller.$modelValue', typeof controller.$modelValue, controller.$modelValue, 'controller.$viewValue', typeof controller.$viewValue, controller.$viewValue);
+          var isActive = angular.equals(controller.$modelValue, value);
+          $$rAF(function () {
+            if (isInput)
+              element[0].checked = isActive;
+            activeElement.toggleClass(options.activeClass, isActive);
+          });
+        };
+        // view -> model
+        element.bind(options.toggleEvent, function () {
+          scope.$apply(function () {
+            // console.warn('!click', element.attr('value'), 'controller.$viewValue', typeof controller.$viewValue, controller.$viewValue, 'controller.$modelValue', typeof controller.$modelValue, controller.$modelValue);
+            controller.$setViewValue(value);
+            controller.$render();
+          });
+        });
+      }
+    };
+  }
+]);
 
 // Source: dropdown.js
 angular.module('mgcrea.ngStrap.dropdown', ['mgcrea.ngStrap.tooltip']).provider('$dropdown', function () {
@@ -1943,6 +1943,100 @@ angular.module('mgcrea.ngStrap.modal', ['mgcrea.ngStrap.helpers.dimensions']).pr
   }
 ]);
 
+// Source: popover.js
+angular.module('mgcrea.ngStrap.popover', ['mgcrea.ngStrap.tooltip']).provider('$popover', function () {
+  var defaults = this.defaults = {
+      animation: 'am-fade',
+      placement: 'right',
+      template: 'popover/popover.tpl.html',
+      contentTemplate: false,
+      trigger: 'click',
+      keyboard: true,
+      html: false,
+      title: '',
+      content: '',
+      delay: 0,
+      container: false
+    };
+  this.$get = [
+    '$tooltip',
+    function ($tooltip) {
+      function PopoverFactory(element, config) {
+        // Common vars
+        var options = angular.extend({}, defaults, config);
+        var $popover = $tooltip(element, options);
+        // Support scope as string options [/*title, */content]
+        if (options.content) {
+          $popover.$scope.content = options.content;
+        }
+        return $popover;
+      }
+      return PopoverFactory;
+    }
+  ];
+}).directive('bsPopover', [
+  '$window',
+  '$location',
+  '$sce',
+  '$popover',
+  function ($window, $location, $sce, $popover) {
+    var requestAnimationFrame = $window.requestAnimationFrame || $window.setTimeout;
+    return {
+      restrict: 'EAC',
+      scope: true,
+      link: function postLink(scope, element, attr) {
+        // Directive options
+        var options = { scope: scope };
+        angular.forEach([
+          'template',
+          'contentTemplate',
+          'placement',
+          'container',
+          'delay',
+          'trigger',
+          'keyboard',
+          'html',
+          'animation'
+        ], function (key) {
+          if (angular.isDefined(attr[key]))
+            options[key] = attr[key];
+        });
+        // Support scope as data-attrs
+        angular.forEach([
+          'title',
+          'content'
+        ], function (key) {
+          attr[key] && attr.$observe(key, function (newValue, oldValue) {
+            scope[key] = $sce.trustAsHtml(newValue);
+            angular.isDefined(oldValue) && requestAnimationFrame(function () {
+              popover && popover.$applyPlacement();
+            });
+          });
+        });
+        // Support scope as an object
+        attr.bsPopover && scope.$watch(attr.bsPopover, function (newValue, oldValue) {
+          if (angular.isObject(newValue)) {
+            angular.extend(scope, newValue);
+          } else {
+            scope.content = newValue;
+          }
+          angular.isDefined(oldValue) && requestAnimationFrame(function () {
+            popover && popover.$applyPlacement();
+          });
+        }, true);
+        // Initialize popover
+        var popover = $popover(element, options);
+        // Garbage collection
+        scope.$on('$destroy', function () {
+          popover.destroy();
+          options = null;
+          popover = null;
+        });
+      }
+    };
+  }
+]);
+
 // Source: navbar.js
 angular.module('mgcrea.ngStrap.navbar', []).provider('$navbar', function () {
   var defaults = this.defaults = {
@@ -1986,6 +2080,229 @@ angular.module('mgcrea.ngStrap.navbar', []).provider('$navbar', function () {
               liElement.removeClass(options.activeClass);
             }
           });
+        });
+      }
+    };
+  }
+]);
+
+// Source: scrollspy.js
+angular.module('mgcrea.ngStrap.scrollspy', [
+  'mgcrea.ngStrap.helpers.debounce',
+  'mgcrea.ngStrap.helpers.dimensions'
+]).provider('$scrollspy', function () {
+  // Pool of registered spies
+  var spies = this.$$spies = {};
+  var defaults = this.defaults = {
+      debounce: 150,
+      throttle: 100,
+      offset: 100
+    };
+  this.$get = [
+    '$window',
+    '$document',
+    '$rootScope',
+    'dimensions',
+    'debounce',
+    'throttle',
+    function ($window, $document, $rootScope, dimensions, debounce, throttle) {
+      var windowEl = angular.element($window);
+      var docEl = angular.element($document.prop('documentElement'));
+      var bodyEl = angular.element($window.document.body);
+      // Helper functions
+      function nodeName(element, name) {
+        return element[0].nodeName && element[0].nodeName.toLowerCase() === name.toLowerCase();
+      }
+      function ScrollSpyFactory(config) {
+        // Common vars
+        var options = angular.extend({}, defaults, config);
+        if (!options.element)
+          options.element = bodyEl;
+        var isWindowSpy = nodeName(options.element, 'body');
+        var scrollEl = isWindowSpy ? windowEl : options.element;
+        var scrollId = isWindowSpy ? 'window' : options.id;
+        // Use existing spy
+        if (spies[scrollId]) {
+          spies[scrollId].$$count++;
+          return spies[scrollId];
+        }
+        var $scrollspy = {};
+        // Private vars
+        var unbindViewContentLoaded, unbindIncludeContentLoaded;
+        var trackedElements = $scrollspy.$trackedElements = [];
+        var sortedElements = [];
+        var activeTarget;
+        var debouncedCheckPosition;
+        var throttledCheckPosition;
+        var debouncedCheckOffsets;
+        var viewportHeight;
+        var scrollTop;
+        $scrollspy.init = function () {
+          // Setup internal ref counter
+          this.$$count = 1;
+          // Bind events
+          debouncedCheckPosition = debounce(this.checkPosition, options.debounce);
+          throttledCheckPosition = throttle(this.checkPosition, options.throttle);
+          scrollEl.on('click', this.checkPositionWithEventLoop);
+          windowEl.on('resize', debouncedCheckPosition);
+          scrollEl.on('scroll', throttledCheckPosition);
+          debouncedCheckOffsets = debounce(this.checkOffsets, options.debounce);
+          unbindViewContentLoaded = $rootScope.$on('$viewContentLoaded', debouncedCheckOffsets);
+          unbindIncludeContentLoaded = $rootScope.$on('$includeContentLoaded', debouncedCheckOffsets);
+          debouncedCheckOffsets();
+          // Register spy for reuse
+          if (scrollId) {
+            spies[scrollId] = $scrollspy;
+          }
+        };
+        $scrollspy.destroy = function () {
+          // Check internal ref counter
+          this.$$count--;
+          if (this.$$count > 0) {
+            return;
+          }
+          // Unbind events
+          scrollEl.off('click', this.checkPositionWithEventLoop);
+          windowEl.off('resize', debouncedCheckPosition);
+          scrollEl.off('scroll', debouncedCheckPosition);
+          unbindViewContentLoaded();
+          unbindIncludeContentLoaded();
+          if (scrollId) {
+            delete spies[scrollId];
+          }
+        };
+        $scrollspy.checkPosition = function () {
+          // Not ready yet
+          if (!sortedElements.length)
+            return;
+          // Calculate the scroll position
+          scrollTop = (isWindowSpy ? $window.pageYOffset : scrollEl.prop('scrollTop')) || 0;
+          // Calculate the viewport height for use by the components
+          viewportHeight = Math.max($window.innerHeight, docEl.prop('clientHeight'));
+          // Activate first element if scroll is smaller
+          if (scrollTop < sortedElements[0].offsetTop && activeTarget !== sortedElements[0].target) {
+            return $scrollspy.$activateElement(sortedElements[0]);
+          }
+          // Activate proper element
+          for (var i = sortedElements.length; i--;) {
+            if (angular.isUndefined(sortedElements[i].offsetTop) || sortedElements[i].offsetTop === null)
+              continue;
+            if (activeTarget === sortedElements[i].target)
+              continue;
+            if (scrollTop < sortedElements[i].offsetTop)
+              continue;
+            if (sortedElements[i + 1] && scrollTop > sortedElements[i + 1].offsetTop)
+              continue;
+            return $scrollspy.$activateElement(sortedElements[i]);
+          }
+        };
+        $scrollspy.checkPositionWithEventLoop = function () {
+          setTimeout(this.checkPosition, 1);
+        };
+        // Protected methods
+        $scrollspy.$activateElement = function (element) {
+          if (activeTarget) {
+            var activeElement = $scrollspy.$getTrackedElement(activeTarget);
+            if (activeElement) {
+              activeElement.source.removeClass('active');
+              if (nodeName(activeElement.source, 'li') && nodeName(activeElement.source.parent().parent(), 'li')) {
+                activeElement.source.parent().parent().removeClass('active');
+              }
+            }
+          }
+          activeTarget = element.target;
+          element.source.addClass('active');
+          if (nodeName(element.source, 'li') && nodeName(element.source.parent().parent(), 'li')) {
+            element.source.parent().parent().addClass('active');
+          }
+        };
+        $scrollspy.$getTrackedElement = function (target) {
+          return trackedElements.filter(function (obj) {
+            return obj.target === target;
+          })[0];
+        };
+        // Track offsets behavior
+        $scrollspy.checkOffsets = function () {
+          angular.forEach(trackedElements, function (trackedElement) {
+            var targetElement = document.querySelector(trackedElement.target);
+            trackedElement.offsetTop = targetElement ? dimensions.offset(targetElement).top : null;
+            if (options.offset && trackedElement.offsetTop !== null)
+              trackedElement.offsetTop -= options.offset * 1;
+          });
+          sortedElements = trackedElements.filter(function (el) {
+            return el.offsetTop !== null;
+          }).sort(function (a, b) {
+            return a.offsetTop - b.offsetTop;
+          });
+          debouncedCheckPosition();
+        };
+        $scrollspy.trackElement = function (target, source) {
+          trackedElements.push({
+            target: target,
+            source: source
+          });
+        };
+        $scrollspy.untrackElement = function (target, source) {
+          var toDelete;
+          for (var i = trackedElements.length; i--;) {
+            if (trackedElements[i].target === target && trackedElements[i].source === source) {
+              toDelete = i;
+              break;
+            }
+          }
+          trackedElements = trackedElements.splice(toDelete, 1);
+        };
+        $scrollspy.activate = function (i) {
+          trackedElements[i].addClass('active');
+        };
+        // Initialize plugin
+        $scrollspy.init();
+        return $scrollspy;
+      }
+      return ScrollSpyFactory;
+    }
+  ];
+}).directive('bsScrollspy', [
+  '$rootScope',
+  'debounce',
+  'dimensions',
+  '$scrollspy',
+  function ($rootScope, debounce, dimensions, $scrollspy) {
+    return {
+      restrict: 'EAC',
+      link: function postLink(scope, element, attr) {
+        var options = { scope: scope };
+        angular.forEach([
+          'offset',
+          'target'
+        ], function (key) {
+          if (angular.isDefined(attr[key]))
+            options[key] = attr[key];
+        });
+        var scrollspy = $scrollspy(options);
+        scrollspy.trackElement(options.target, element);
+        scope.$on('$destroy', function () {
+          scrollspy.untrackElement(options.target, element);
+          scrollspy.destroy();
+          options = null;
+          scrollspy = null;
+        });
+      }
+    };
+  }
+]).directive('bsScrollspyList', [
+  '$rootScope',
+  'debounce',
+  'dimensions',
+  '$scrollspy',
+  function ($rootScope, debounce, dimensions, $scrollspy) {
+    return {
+      restrict: 'A',
+      compile: function postLink(element, attr) {
+        var children = element[0].querySelectorAll('li > a[href]');
+        angular.forEach(children, function (child) {
+          var childEl = angular.element(child);
+          childEl.parent().attr('bs-scrollspy', '').attr('data-target', childEl.attr('href'));
         });
       }
     };
@@ -2261,323 +2578,6 @@ angular.module('mgcrea.ngStrap.select', [
           select.destroy();
           options = null;
           select = null;
-        });
-      }
-    };
-  }
-]);
-
-// Source: popover.js
-angular.module('mgcrea.ngStrap.popover', ['mgcrea.ngStrap.tooltip']).provider('$popover', function () {
-  var defaults = this.defaults = {
-      animation: 'am-fade',
-      placement: 'right',
-      template: 'popover/popover.tpl.html',
-      contentTemplate: false,
-      trigger: 'click',
-      keyboard: true,
-      html: false,
-      title: '',
-      content: '',
-      delay: 0,
-      container: false
-    };
-  this.$get = [
-    '$tooltip',
-    function ($tooltip) {
-      function PopoverFactory(element, config) {
-        // Common vars
-        var options = angular.extend({}, defaults, config);
-        var $popover = $tooltip(element, options);
-        // Support scope as string options [/*title, */content]
-        if (options.content) {
-          $popover.$scope.content = options.content;
-        }
-        return $popover;
-      }
-      return PopoverFactory;
-    }
-  ];
-}).directive('bsPopover', [
-  '$window',
-  '$location',
-  '$sce',
-  '$popover',
-  function ($window, $location, $sce, $popover) {
-    var requestAnimationFrame = $window.requestAnimationFrame || $window.setTimeout;
-    return {
-      restrict: 'EAC',
-      scope: true,
-      link: function postLink(scope, element, attr) {
-        // Directive options
-        var options = { scope: scope };
-        angular.forEach([
-          'template',
-          'contentTemplate',
-          'placement',
-          'container',
-          'delay',
-          'trigger',
-          'keyboard',
-          'html',
-          'animation'
-        ], function (key) {
-          if (angular.isDefined(attr[key]))
-            options[key] = attr[key];
-        });
-        // Support scope as data-attrs
-        angular.forEach([
-          'title',
-          'content'
-        ], function (key) {
-          attr[key] && attr.$observe(key, function (newValue, oldValue) {
-            scope[key] = $sce.trustAsHtml(newValue);
-            angular.isDefined(oldValue) && requestAnimationFrame(function () {
-              popover && popover.$applyPlacement();
-            });
-          });
-        });
-        // Support scope as an object
-        attr.bsPopover && scope.$watch(attr.bsPopover, function (newValue, oldValue) {
-          if (angular.isObject(newValue)) {
-            angular.extend(scope, newValue);
-          } else {
-            scope.content = newValue;
-          }
-          angular.isDefined(oldValue) && requestAnimationFrame(function () {
-            popover && popover.$applyPlacement();
-          });
-        }, true);
-        // Initialize popover
-        var popover = $popover(element, options);
-        // Garbage collection
-        scope.$on('$destroy', function () {
-          popover.destroy();
-          options = null;
-          popover = null;
-        });
-      }
-    };
-  }
-]);
-
-// Source: scrollspy.js
-angular.module('mgcrea.ngStrap.scrollspy', [
-  'mgcrea.ngStrap.helpers.debounce',
-  'mgcrea.ngStrap.helpers.dimensions'
-]).provider('$scrollspy', function () {
-  // Pool of registered spies
-  var spies = this.$$spies = {};
-  var defaults = this.defaults = {
-      debounce: 150,
-      throttle: 100,
-      offset: 100
-    };
-  this.$get = [
-    '$window',
-    '$document',
-    '$rootScope',
-    'dimensions',
-    'debounce',
-    'throttle',
-    function ($window, $document, $rootScope, dimensions, debounce, throttle) {
-      var windowEl = angular.element($window);
-      var docEl = angular.element($document.prop('documentElement'));
-      var bodyEl = angular.element($window.document.body);
-      // Helper functions
-      function nodeName(element, name) {
-        return element[0].nodeName && element[0].nodeName.toLowerCase() === name.toLowerCase();
-      }
-      function ScrollSpyFactory(config) {
-        // Common vars
-        var options = angular.extend({}, defaults, config);
-        if (!options.element)
-          options.element = bodyEl;
-        var isWindowSpy = nodeName(options.element, 'body');
-        var scrollEl = isWindowSpy ? windowEl : options.element;
-        var scrollId = isWindowSpy ? 'window' : options.id;
-        // Use existing spy
-        if (spies[scrollId]) {
-          spies[scrollId].$$count++;
-          return spies[scrollId];
-        }
-        var $scrollspy = {};
-        // Private vars
-        var unbindViewContentLoaded, unbindIncludeContentLoaded;
-        var trackedElements = $scrollspy.$trackedElements = [];
-        var sortedElements = [];
-        var activeTarget;
-        var debouncedCheckPosition;
-        var throttledCheckPosition;
-        var debouncedCheckOffsets;
-        var viewportHeight;
-        var scrollTop;
-        $scrollspy.init = function () {
-          // Setup internal ref counter
-          this.$$count = 1;
-          // Bind events
-          debouncedCheckPosition = debounce(this.checkPosition, options.debounce);
-          throttledCheckPosition = throttle(this.checkPosition, options.throttle);
-          scrollEl.on('click', this.checkPositionWithEventLoop);
-          windowEl.on('resize', debouncedCheckPosition);
-          scrollEl.on('scroll', throttledCheckPosition);
-          debouncedCheckOffsets = debounce(this.checkOffsets, options.debounce);
-          unbindViewContentLoaded = $rootScope.$on('$viewContentLoaded', debouncedCheckOffsets);
-          unbindIncludeContentLoaded = $rootScope.$on('$includeContentLoaded', debouncedCheckOffsets);
-          debouncedCheckOffsets();
-          // Register spy for reuse
-          if (scrollId) {
-            spies[scrollId] = $scrollspy;
-          }
-        };
-        $scrollspy.destroy = function () {
-          // Check internal ref counter
-          this.$$count--;
-          if (this.$$count > 0) {
-            return;
-          }
-          // Unbind events
-          scrollEl.off('click', this.checkPositionWithEventLoop);
-          windowEl.off('resize', debouncedCheckPosition);
-          scrollEl.off('scroll', debouncedCheckPosition);
-          unbindViewContentLoaded();
-          unbindIncludeContentLoaded();
-          if (scrollId) {
-            delete spies[scrollId];
-          }
-        };
-        $scrollspy.checkPosition = function () {
-          // Not ready yet
-          if (!sortedElements.length)
-            return;
-          // Calculate the scroll position
-          scrollTop = (isWindowSpy ? $window.pageYOffset : scrollEl.prop('scrollTop')) || 0;
-          // Calculate the viewport height for use by the components
-          viewportHeight = Math.max($window.innerHeight, docEl.prop('clientHeight'));
-          // Activate first element if scroll is smaller
-          if (scrollTop < sortedElements[0].offsetTop && activeTarget !== sortedElements[0].target) {
-            return $scrollspy.$activateElement(sortedElements[0]);
-          }
-          // Activate proper element
-          for (var i = sortedElements.length; i--;) {
-            if (angular.isUndefined(sortedElements[i].offsetTop) || sortedElements[i].offsetTop === null)
-              continue;
-            if (activeTarget === sortedElements[i].target)
-              continue;
-            if (scrollTop < sortedElements[i].offsetTop)
-              continue;
-            if (sortedElements[i + 1] && scrollTop > sortedElements[i + 1].offsetTop)
-              continue;
-            return $scrollspy.$activateElement(sortedElements[i]);
-          }
-        };
-        $scrollspy.checkPositionWithEventLoop = function () {
-          setTimeout(this.checkPosition, 1);
-        };
-        // Protected methods
-        $scrollspy.$activateElement = function (element) {
-          if (activeTarget) {
-            var activeElement = $scrollspy.$getTrackedElement(activeTarget);
-            if (activeElement) {
-              activeElement.source.removeClass('active');
-              if (nodeName(activeElement.source, 'li') && nodeName(activeElement.source.parent().parent(), 'li')) {
-                activeElement.source.parent().parent().removeClass('active');
-              }
-            }
-          }
-          activeTarget = element.target;
-          element.source.addClass('active');
-          if (nodeName(element.source, 'li') && nodeName(element.source.parent().parent(), 'li')) {
-            element.source.parent().parent().addClass('active');
-          }
-        };
-        $scrollspy.$getTrackedElement = function (target) {
-          return trackedElements.filter(function (obj) {
-            return obj.target === target;
-          })[0];
-        };
-        // Track offsets behavior
-        $scrollspy.checkOffsets = function () {
-          angular.forEach(trackedElements, function (trackedElement) {
-            var targetElement = document.querySelector(trackedElement.target);
-            trackedElement.offsetTop = targetElement ? dimensions.offset(targetElement).top : null;
-            if (options.offset && trackedElement.offsetTop !== null)
-              trackedElement.offsetTop -= options.offset * 1;
-          });
-          sortedElements = trackedElements.filter(function (el) {
-            return el.offsetTop !== null;
-          }).sort(function (a, b) {
-            return a.offsetTop - b.offsetTop;
-          });
-          debouncedCheckPosition();
-        };
-        $scrollspy.trackElement = function (target, source) {
-          trackedElements.push({
-            target: target,
-            source: source
-          });
-        };
-        $scrollspy.untrackElement = function (target, source) {
-          var toDelete;
-          for (var i = trackedElements.length; i--;) {
-            if (trackedElements[i].target === target && trackedElements[i].source === source) {
-              toDelete = i;
-              break;
-            }
-          }
-          trackedElements = trackedElements.splice(toDelete, 1);
-        };
-        $scrollspy.activate = function (i) {
-          trackedElements[i].addClass('active');
-        };
-        // Initialize plugin
-        $scrollspy.init();
-        return $scrollspy;
-      }
-      return ScrollSpyFactory;
-    }
-  ];
-}).directive('bsScrollspy', [
-  '$rootScope',
-  'debounce',
-  'dimensions',
-  '$scrollspy',
-  function ($rootScope, debounce, dimensions, $scrollspy) {
-    return {
-      restrict: 'EAC',
-      link: function postLink(scope, element, attr) {
-        var options = { scope: scope };
-        angular.forEach([
-          'offset',
-          'target'
-        ], function (key) {
-          if (angular.isDefined(attr[key]))
-            options[key] = attr[key];
-        });
-        var scrollspy = $scrollspy(options);
-        scrollspy.trackElement(options.target, element);
-        scope.$on('$destroy', function () {
-          scrollspy.untrackElement(options.target, element);
-          scrollspy.destroy();
-          options = null;
-          scrollspy = null;
-        });
-      }
-    };
-  }
-]).directive('bsScrollspyList', [
-  '$rootScope',
-  'debounce',
-  'dimensions',
-  '$scrollspy',
-  function ($rootScope, debounce, dimensions, $scrollspy) {
-    return {
-      restrict: 'A',
-      compile: function postLink(element, attr) {
-        var children = element[0].querySelectorAll('li > a[href]');
-        angular.forEach(children, function (child) {
-          var childEl = angular.element(child);
-          childEl.parent().attr('bs-scrollspy', '').attr('data-target', childEl.attr('href'));
         });
       }
     };
@@ -3327,10 +3327,31 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.helpers.dimensions']).
           var elementPosition = getPosition();
           // Get the height and width of the tooltip so we can center it.
           var tipWidth = tipElement.prop('offsetWidth'), tipHeight = tipElement.prop('offsetHeight');
+          // TODO $options.placement check for auto
+          var autoToken = /\s?auto?\s?/i;
+          var autoPlace = autoToken.test($tooltip.$options.placement);
+          // TODO if auto then place onscreen
+          if (autoPlace) {
+            var $parent = $tooltip.$element.parent();
+            var pos = elementPosition;
+            var actualWidth = tipWidth;
+            var actualHeight = tipHeight;
+            var orgPlacement = $tooltip.$options.placement;
+            var docScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            var parentWidth = $tooltip.$options.container == 'body' ? window.innerWidth : $parent.outerWidth();
+            var parentHeight = $tooltip.$options.container == 'body' ? window.innerHeight : $parent.outerHeight();
+            var parentLeft = $tooltip.$options.container == 'body' ? 0 : $parent.offset().left;
+            var placement = 'top';
+            placement = placement == 'bottom' && pos.top + pos.height + actualHeight - docScroll > parentHeight ? 'top' : placement == 'top' && pos.top - docScroll - actualHeight < 0 ? 'bottom' : placement == 'right' && pos.right + actualWidth > parentWidth ? 'left' : placement == 'left' && pos.left - actualWidth < parentLeft ? 'right' : placement;
+            $tooltip.$element.removeClass(orgPlacement).addClass(placement);
+            options.placement = placement;
+          }
           // Get the tooltip's top and left coordinates to center it with this directive.
           var tipPosition = getCalculatedOffset(options.placement, elementPosition, tipWidth, tipHeight);
           // Now set the calculated positioning.
           tipPosition.top += 'px';
+          tipPosition.left = tipPosition.left < 0 ? 0 : tipPosition.left;
+          // TODO correct arrow placement
           tipPosition.left += 'px';
           tipElement.css(tipPosition);
         };
